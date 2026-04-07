@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acompanhamento — Provimento CNJ 213/2026 · Classe 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --border: #e5e3dc;
+    --border-strong: #ccc9bf;
+    --text: #1a1a18;
+    --text-muted: #6b6860;
+    --text-faint: #9b9890;
+    --green: #1D9E75;
+    --green-light: #e8f7f1;
+    --green-text: #0f6e56;
+    --red-light: #fff3eb;
+    --red-text: #854F0B;
+    --blue-light: #eef3fb;
+    --blue-text: #185FA5;
+    --purple-light: #f0effe;
+    --purple-text: #534AB7;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 760px; margin: 0 auto; }
+
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+
+  .page-header p { font-size: 13px; color: var(--text-muted); }
+
+  .meta-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .meta-chip {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--surface);
+  }
+
+  .sync-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-left: auto;
+  }
+
+  .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+
+  .sync-dot.syncing { background: #f59e0b; animation: pulse 1s infinite; }
+  .sync-dot.ok { background: var(--green); }
+  .sync-dot.error { background: #e24b4a; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .progress-section { margin-bottom: 1.75rem; }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .progress-header span { font-size: 13px; color: var(--text-muted); }
+  .progress-header strong { font-size: 15px; font-weight: 600; }
+
+  .progress-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 8px;
+    background: var(--green);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-size: 12px;
+    font-family: inherit;
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .filter-btn:hover { border-color: var(--text-faint); color: var(--text); }
+  .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  .etapa {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .etapa-progress { height: 3px; background: var(--border); }
+  .etapa-progress-fill { height: 3px; background: var(--green); transition: width 0.3s ease; }
+
+  .etapa-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s;
+  }
+
+  .etapa-header:hover { background: #fafaf8; }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-red    { background: var(--red-light);    color: var(--red-text); }
+  .badge-blue   { background: var(--blue-light);   color: var(--blue-text); }
+  .badge-green  { background: var(--green-light);  color: var(--green-text); }
+  .badge-purple { background: var(--purple-light); color: var(--purple-text); }
+
+  .etapa-title { font-size: 13px; font-weight: 500; flex: 1; min-width: 0; }
+  .etapa-deadline { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+  .etapa-count { font-size: 12px; color: var(--text-faint); white-space: nowrap; min-width: 36px; text-align: right; }
+  .chevron { font-size: 10px; color: var(--text-faint); transition: transform 0.2s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .etapa-body { border-top: 1px solid var(--border); }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.1s;
+    border-bottom: 1px solid #f3f2ef;
+  }
+
+  .task:last-child { border-bottom: none; }
+  .task:hover { background: #fafaf8; }
+  .task.saving { opacity: 0.6; pointer-events: none; }
+
+  .task-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 11px;
+    color: #fff;
+  }
+
+  .task-checkbox.checked { background: var(--green); border-color: var(--green); }
+
+  .task-content { flex: 1; min-width: 0; }
+
+  .task-text { font-size: 13px; line-height: 1.45; color: var(--text); }
+  .task-text.done { text-decoration: line-through; color: var(--text-faint); }
+  .task-resp { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+
+  .task-chips { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+
+  .chip { font-size: 10px; padding: 2px 8px; border-radius: 99px; white-space: nowrap; font-weight: 500; }
+  .chip-urg  { background: #fff0e6; color: #954300; }
+  .chip-done { background: var(--green-light); color: var(--green-text); }
+
+  .empty-state { padding: 14px 16px; font-size: 12px; color: var(--text-faint); font-style: italic; }
+
+  .loading-overlay {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-banner {
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #991b1b;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .footer {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer-note { font-size: 11px; color: var(--text-faint); }
+
+  .reset-btn {
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text-faint);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .reset-btn:hover { color: var(--text-muted); }
+
+  @media (max-width: 500px) {
+    .etapa-deadline { display: none; }
+    .sync-indicator span { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <h1>Adequação ao Provimento CNJ n.º 213/2026</h1>
+    <p>Plano de Ação — Serventia Extrajudicial · Classe 3</p>
+    <div class="meta-row">
+      <span class="meta-chip">⚖️ Vigência: 24/02/2026</span>
+      <span class="meta-chip">⏱ Prazo urgente: 25/05/2026</span>
+      <span class="meta-chip">📅 Prazo final: 24/02/2028</span>
+      <div class="sync-indicator">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-label">Conectando…</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-banner" class="error-banner">
+    Não foi possível conectar ao servidor. Verifique sua conexão e recarregue a página.
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-header">
+      <span id="prog-label">Carregando…</span>
+      <strong id="prog-pct">0%</strong>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-f="all">Todas</button>
+    <button class="filter-btn" data-f="pend">Pendentes</button>
+    <button class="filter-btn" data-f="done">Concluídas</button>
+    <button class="filter-btn" data-f="urg">Urgentes (90d)</button>
+  </div>
+
+  <div id="root">
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      Carregando progresso…
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-note">Progresso sincronizado em tempo real para todos os participantes.</span>
+    <button class="reset-btn" id="reset-btn">↺ Reiniciar progresso</button>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbxrzN4xmNU9qw_9P_rZ5QDfCMa7TdSsEIHdWQWuaaxXggEQ_u-vJ5w60BQjbur9N34z/exec';
+
+const DATA = [
+  {id:'e1',badge:'badge-red',bl:'Urgente — 90 dias',title:'Etapa 1 — Governança, LGPD e estrutura legal',prazo:'⏱ 25/05/2026',urg:true,tasks:[
+    {id:'1a',t:'Designar formalmente o Responsável Técnico Interno (RTI)',r:'Delegatário · Semana 1'},
+    {id:'1b',t:'Designar a serventia como Controladora de dados pessoais (LGPD)',r:'Delegatário · Semana 1'},
+    {id:'1c',t:'Designar DPO / Encarregado (quando aplicável)',r:'Delegatário · Semana 1'},
+    {id:'1d',t:'Elaborar e aprovar Política de Segurança da Informação (Anexo III)',r:'RTI + Delegatário · Semanas 2–3'},
+    {id:'1e',t:'Implementar autenticação individualizada para todos os usuários',r:'RTI + Fornecedor TI · Semanas 2–4'},
+    {id:'1f',t:'Implementar MFA obrigatório para acessos administrativos e críticos',r:'RTI + Fornecedor TI · Semanas 2–4'},
+    {id:'1g',t:'Eliminar credenciais compartilhadas ou genéricas de todos os sistemas',r:'RTI + Fornecedor TI · Semanas 2–4'},
+    {id:'1h',t:'Registrar operações de tratamento de dados (LGPD, art. 37)',r:'DPO + RTI · Semanas 3–5'},
+    {id:'1i',t:'Elaborar inventário de ativos: hardware, software, contratos, certificados',r:'RTI · Semanas 2–5'},
+    {id:'1j',t:'Regularizar licenciamento e eliminar softwares em EOL',r:'RTI + Fornecedor TI · Semanas 3–8'},
+    {id:'1k',t:'Revisar contratos de TI: reversibilidade, portabilidade, LGPD',r:'Delegatário + Jurídico · Semanas 3–10'},
+    {id:'1l',t:'Estabelecer procedimento de comunicação de incidentes (prazo legal: 72h)',r:'RTI + DPO · Semanas 3–6'},
+    {id:'1m',t:'Registrar conclusão da Etapa 1 no Sistema Justiça Aberta',r:'Delegatário · Até 25/05/2026'},
+  ]},
+  {id:'e2',badge:'badge-red',bl:'Urgente — 90 dias',title:'Etapa 2 — Infraestrutura e continuidade operacional',prazo:'⏱ 25/05/2026',urg:true,tasks:[
+    {id:'2a',t:'Instalar SAI/UPS com autonomia mínima de 30 min para ativos críticos',r:'RTI + Fornecedor TI · Semanas 2–6'},
+    {id:'2b',t:'Aferir aterramento elétrico e emitir laudo com ART',r:'Eletricista habilitado · Semanas 3–7'},
+    {id:'2c',t:'Elaborar plano de contingência energética',r:'RTI · Semanas 4–7'},
+    {id:'2d',t:'Controle de acesso físico restrito ao datacenter / sala de TI',r:'RTI + Gestão predial · Semanas 3–8'},
+    {id:'2e',t:'Proteção contra incêndio, inundações e variações térmicas',r:'RTI + Gestão predial · Semanas 3–8'},
+    {id:'2f',t:'Contratar link de 50 Mbps e redundância de conectividade',r:'RTI + Fornecedor TI · Semanas 2–6'},
+    {id:'2g',t:'Configurar roteador e switch adequados',r:'RTI + Fornecedor TI · Semanas 2–6'},
+    {id:'2h',t:'Implementar antivírus / antimalware em todas as estações e servidores',r:'RTI + Fornecedor TI · Semanas 2–5'},
+    {id:'2i',t:'Elaborar PCN e PRD com RTO ≤ 8h e RPO ≤ 4h (planos de 30/90 dias)',r:'RTI + Delegatário · Semanas 4–10'},
+    {id:'2j',t:'Formalizar documento técnico de arquitetura (topologia, backups, integrações)',r:'RTI · Semanas 5–10'},
+    {id:'2k',t:'Contratar suporte técnico contínuo com SLA documentado',r:'Delegatário · Semanas 2–6'},
+    {id:'2l',t:'Registrar conclusão da Etapa 2 no Sistema Justiça Aberta',r:'Delegatário · Até 25/05/2026'},
+  ]},
+  {id:'e3',badge:'badge-blue',bl:'Meta interna — 6 meses',title:'Etapa 3 — Proteção do acervo digital e resiliência',prazo:'24/08/2026',urg:false,tasks:[
+    {id:'3a',t:'Criptografia TLS 1.2+ para todos os dados em trânsito',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3b',t:'Criptografia AES-256 para dados críticos em repouso',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3c',t:'Criptografar backups antes do envio externo (chave sob custódia da serventia)',r:'RTI + Fornecedor TI · Mês 3–5'},
+    {id:'3d',t:'Formalizar gestão de chaves: inventário, custódia, rotação e registros',r:'RTI · Mês 3–5'},
+    {id:'3e',t:'Backup completo automatizado a cada 24 horas',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3f',t:'Backup incremental compatível com RPO de 4 horas',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3g',t:'Armazenamento em 2 ambientes independentes (nuvem redundante + off-site)',r:'RTI + Fornecedor TI · Mês 3–5'},
+    {id:'3h',t:'Proteger ao menos 1 ambiente contra ransomware (WORM / imutabilidade)',r:'RTI + Fornecedor TI · Mês 4–6'},
+    {id:'3i',t:'Alertas automáticos de falha de backup com registro formal',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3j',t:'Firewall stateful com IPS/IDS e segmentação por VLAN',r:'RTI + Fornecedor TI · Mês 3–6'},
+    {id:'3k',t:'Solução EDR ou equivalente com análise comportamental',r:'RTI + Fornecedor TI · Mês 4–6'},
+    {id:'3l',t:'Alta disponibilidade (HA) ou tolerância a falhas compatível com RTO ≤ 8h',r:'RTI + Fornecedor TI · Mês 4–6'},
+    {id:'3m',t:'Trilhas de auditoria imutáveis — Nível Intermediário mínimo, NTP sincronizado',r:'RTI + Fornecedor TI · Mês 3–5'},
+    {id:'3n',t:'SGBD com integridade transacional e logs ativos',r:'RTI + Fornecedor TI · Mês 3–4'},
+    {id:'3o',t:'Registrar conclusão da Etapa 3 no Sistema Justiça Aberta',r:'Delegatário · Até 24/08/2026'},
+  ]},
+  {id:'e4',badge:'badge-blue',bl:'Meta interna — 9 meses',title:'Etapa 4 — Monitoramento, auditoria e validação',prazo:'24/11/2026',urg:false,tasks:[
+    {id:'4a',t:'Relatório de conformidade das trilhas de auditoria (imutabilidade, NTP, retenção 5 anos)',r:'RTI · Mês 7–8'},
+    {id:'4b',t:'Rotina documentada de atualização periódica de sistemas',r:'RTI + Fornecedor TI · Mês 7'},
+    {id:'4c',t:'Gestão formal de vulnerabilidades: críticas ≤ 30d; exploração ativa ≤ 72h',r:'RTI · Mês 7–8'},
+    {id:'4d',t:'1.ª simulação de desastre para validação do PCN e PRD',r:'RTI + equipe · Mês 8–9'},
+    {id:'4e',t:'1.º teste de restauração de backup (ata — Anexo V do Provimento)',r:'RTI + Fornecedor TI · Mês 6'},
+    {id:'4f',t:'2.º teste de restauração de backup (semestral)',r:'RTI + Fornecedor TI · Mês 12'},
+    {id:'4g',t:'Avaliação técnica periódica de segurança',r:'RTI + especialista · Mês 8–9'},
+    {id:'4h',t:'1.º pentest ou metodologia equivalente (admite relatório coletivo)',r:'RTI + empresa especializada · Mês 9–12'},
+    {id:'4i',t:'Documentar causa raiz e lições aprendidas de todos os incidentes',r:'RTI + DPO · Contínuo'},
+    {id:'4j',t:'Registrar conclusão da Etapa 4 no Sistema Justiça Aberta',r:'Delegatário · Até 24/11/2026'},
+  ]},
+  {id:'e5',badge:'badge-green',bl:'Prazo legal — 24 meses',title:'Etapa 5 — Interoperabilidade e governança evolutiva',prazo:'24/02/2028',urg:false,tasks:[
+    {id:'5a',t:'Interoperabilidade com plataformas de fiscalização do CNJ (art. 19)',r:'RTI + Fornecedor TI · Mês 18–22'},
+    {id:'5b',t:'Adotar padrões abertos: PDF/A e XML; garantir neutralidade tecnológica',r:'RTI + Fornecedor TI · Mês 12–18'},
+    {id:'5c',t:'Capacitação periódica com registro formal para todos os colaboradores',r:'RTI + Delegatário · Trimestral'},
+    {id:'5d',t:'Revisão formal da Política de Segurança após alterações normativas ou tecnológicas',r:'RTI + Delegatário · Anual'},
+    {id:'5e',t:'Retenção de todos os registros auditáveis por mínimo de 5 anos',r:'RTI + Fornecedor TI · Contínuo'},
+    {id:'5f',t:'1.ª simulação de extração integral do acervo em formato interoperável',r:'RTI + Fornecedor TI · Até encerramento da Etapa 5'},
+    {id:'5g',t:'Formalizar plano de reversibilidade e portabilidade com evidências técnicas',r:'RTI + Delegatário · Mês 20–23'},
+    {id:'5h',t:'Registrar conclusão da Etapa 5 no Sistema Justiça Aberta',r:'Delegatário · Até 24/02/2028'},
+  ]},
+  {id:'ec',badge:'badge-purple',bl:'Recorrente',title:'Ciclo contínuo — Obrigações pós-adequação',prazo:'↺ perpétuo',urg:false,tasks:[
+    {id:'ca',t:'Declaração anual de conformidade no Sistema Justiça Aberta',r:'Delegatário · Anual'},
+    {id:'cb',t:'Teste de restauração de backup com ata (Anexo V)',r:'RTI + Fornecedor · Semestral'},
+    {id:'cc',t:'Simulação de desastre (PCN/PRD)',r:'RTI + equipe · Anual'},
+    {id:'cd',t:'Pentest ou avaliação técnica equivalente',r:'RTI + especializada · A cada 2 anos'},
+    {id:'ce',t:'Simulação de extração integral do acervo (portabilidade)',r:'RTI + Fornecedor · A cada 24 meses'},
+    {id:'cf',t:'Revisão da Política de Segurança da Informação',r:'RTI + Delegatário · Anual'},
+    {id:'cg',t:'Avaliação de enquadramento de classe (arrecadação semestral)',r:'Delegatário + Financeiro · Anual'},
+    {id:'ch',t:'Renovação de certificados digitais',r:'RTI · Conforme vencimento'},
+    {id:'ci',t:'Capacitação periódica da equipe',r:'RTI + Delegatário · Mínimo anual'},
+  ]},
+];
+
+let S = {};
+let F = 'all';
+const open = new Set(['e1','e2']);
+let pollTimer = null;
+
+function setSync(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+async function loadFromSheet() {
+  try {
+    setSync('syncing', 'Sincronizando…');
+    const res = await fetch(API);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    S = data;
+    setSync('ok', 'Sincronizado');
+    document.getElementById('error-banner').style.display = 'none';
+    render();
+  } catch(e) {
+    setSync('error', 'Erro de conexão');
+    document.getElementById('error-banner').style.display = 'block';
+    render();
+  }
+}
+
+async function saveToSheet(patch) {
+  try {
+    setSync('syncing', 'Salvando…');
+    const res = await fetch(API, {
+      method: 'POST',
+      body: JSON.stringify(patch),
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    setSync('ok', 'Salvo');
+  } catch(e) {
+    setSync('error', 'Erro ao salvar');
+  }
+}
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(loadFromSheet, 30000);
+}
+
+async function toggle(id) {
+  S[id] = !S[id];
+  render();
+  await saveToSheet({ [id]: S[id] });
+}
+
+function counts() {
+  let d = 0, t = 0;
+  DATA.forEach(e => e.tasks.forEach(tk => { t++; if (S[tk.id]) d++; }));
+  return { d, t };
+}
+
+function render() {
+  const { d, t } = counts();
+  const pct = t ? Math.round(d / t * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-label').textContent = d + ' de ' + t + ' tarefas concluídas';
+
+  const root = document.getElementById('root');
+  root.innerHTML = '';
+
+  DATA.forEach(e => {
+    let vis = e.tasks;
+    if (F === 'pend') vis = e.tasks.filter(tk => !S[tk.id]);
+    if (F === 'done') vis = e.tasks.filter(tk => S[tk.id]);
+    if (F === 'urg')  vis = e.urg ? e.tasks.filter(tk => !S[tk.id]) : [];
+
+    const ed = e.tasks.filter(tk => S[tk.id]).length;
+    const et = e.tasks.length;
+    const ep = et ? Math.round(ed / et * 100) : 0;
+    const isOpen = open.has(e.id);
+
+    const div = document.createElement('div');
+    div.className = 'etapa';
+
+    let bodyHtml = '';
+    if (isOpen) {
+      if (vis.length === 0) {
+        bodyHtml = '<div class="etapa-body"><p class="empty-state">Nenhuma tarefa neste filtro.</p></div>';
+      } else {
+        const rows = vis.map(tk => {
+          const isDone = !!S[tk.id];
+          return `<div class="task" data-id="${tk.id}">
+            <div class="task-checkbox ${isDone ? 'checked' : ''}">${isDone ? '✓' : ''}</div>
+            <div class="task-content">
+              <div class="task-text ${isDone ? 'done' : ''}">${tk.t}</div>
+              <div class="task-resp">${tk.r}</div>
+            </div>
+            <div class="task-chips">
+              ${e.urg && !isDone ? '<span class="chip chip-urg">urgente</span>' : ''}
+              ${isDone ? '<span class="chip chip-done">✓ feito</span>' : ''}
+            </div>
+          </div>`;
+        }).join('');
+        bodyHtml = `<div class="etapa-body">${rows}</div>`;
+      }
+    }
+
+    div.innerHTML = `
+      <div class="etapa-progress"><div class="etapa-progress-fill" style="width:${ep}%"></div></div>
+      <div class="etapa-header" data-eid="${e.id}">
+        <span class="badge ${e.badge}">${e.bl}</span>
+        <span class="etapa-title">${e.title}</span>
+        <span class="etapa-deadline">${e.prazo}</span>
+        <span class="etapa-count">${ed}/${et}</span>
+        <span class="chevron ${isOpen ? 'open' : ''}">▼</span>
+      </div>
+      ${bodyHtml}`;
+
+    div.querySelector('.etapa-header').addEventListener('click', () => {
+      open.has(e.id) ? open.delete(e.id) : open.add(e.id);
+      render();
+    });
+
+    div.querySelectorAll('.task').forEach(el => {
+      el.addEventListener('click', () => toggle(el.dataset.id));
+    });
+
+    root.appendChild(div);
+  });
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  F = btn.dataset.f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+  if (F === 'urg') { open.add('e1'); open.add('e2'); }
+  render();
+});
+
+document.getElementById('reset-btn').addEventListener('click', async () => {
+  if (!confirm('Reiniciar todo o progresso para todos os participantes?')) return;
+  const patch = {};
+  DATA.forEach(e => e.tasks.forEach(tk => { S[tk.id] = false; patch[tk.id] = false; }));
+  render();
+  await saveToSheet(patch);
+});
+
+loadFromSheet().then(() => startPolling());
+</script>
+</body>
+</html>
